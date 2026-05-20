@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar Sesión | AutoElite</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet"
+href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap">
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.auth-page{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:2rem;
+  background:#0d0f14;
+}
+
+.auth-card{
+  width:100%;
+  max-width:450px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:3rem;
+}
+
+.auth-title{
+  font-family:var(--f-serif);
+  font-size:2.2rem;
+  color:var(--white);
+  margin-bottom:.5rem;
+}
+
+.auth-sub{
+  color:var(--muted);
+  margin-bottom:2rem;
+}
+
+.auth-form{
+  display:flex;
+  flex-direction:column;
+  gap:1.25rem;
+}
+
+.auth-form input{
+  width:100%;
+  padding:1rem;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:#11151c;
+  color:white;
+  outline:none;
+}
+
+.auth-form input:focus{
+  border-color:var(--accent);
+}
+
+.auth-bottom{
+  margin-top:1.5rem;
+  color:var(--muted);
+  text-align:center;
+}
+
+.auth-bottom a{
+  color:var(--accent);
+  text-decoration:none;
+}
+
+.msg{
+  margin-top:1rem;
+  color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<section class="auth-page">
+
+  <div class="auth-card">
+
+    <h1 class="auth-title">Bienvenido de nuevo</h1>
+
+    <p class="auth-sub">
+      Inicia sesión para acceder al catálogo exclusivo.
+    </p>
+
+    <form id="loginForm" class="auth-form">
+
+      <input
+        type="email"
+        id="email"
+        placeholder="Correo electrónico"
+        required
+      >
+
+      <input
+        type="password"
+        id="password"
+        placeholder="Contraseña"
+        required
+      >
+
+      <button class="btn btn--solid btn--lg" type="submit">
+        Iniciar sesión
+      </button>
+
+    </form>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="auth-bottom">
+      ¿No tienes cuenta?
+      <a href="registro.html">Registrarse</a>
+    </div>
+
+  </div>
+
+</section>
+
+<script>
+
+const form = document.getElementById('loginForm');
+const msg  = document.getElementById('msg');
+
+form.addEventListener('submit', async (e)=>{
+
+  e.preventDefault();
+
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  const res = await fetch('/api/auth/login', {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json'
+    },
+    body: JSON.stringify({
+      email,
+      password
+    })
+  });
+
+  const data = await res.json();
+
+  if(data.ok){
+
+    msg.innerHTML = '✅ Inicio de sesión exitoso';
+
+    setTimeout(()=>{
+      window.location.href='/';
+    },1000);
+
+  }else{
+
+    msg.innerHTML = '❌ ' + data.error;
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>

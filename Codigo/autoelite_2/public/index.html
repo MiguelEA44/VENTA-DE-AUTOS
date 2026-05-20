@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoElite — Concesionario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 999;
+    background: rgba(0,0,0,.75); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 2.5rem; max-width: 420px;
+    width: 90%; animation: fadeUp .3s ease;
+  }
+  .modal h3 { font-family: var(--f-serif); font-size: 1.6rem; color: var(--white); margin-bottom: .5rem; }
+  .modal p  { color: var(--muted); font-size: .9rem; margin-bottom: 1.75rem; }
+  .modal__actions { display: flex; gap: .75rem; justify-content: flex-end; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 1000;
+    background: var(--accent); color: #fff;
+    padding: .85rem 1.5rem; border-radius: var(--r);
+    font-size: .875rem; font-weight: 500;
+    transform: translateY(120%); transition: transform .3s ease;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); }
+
+  /* Estado pending en badge */
+  .badge--pending { background: rgba(155,28,28,.18); color: #e05555; border: 1px solid rgba(155,28,28,.35); }
+
+  /* Cat card active */
+  .cat-card.active .cat-card__body { outline: 2px solid var(--accent); border-radius: var(--r); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#" class="nav__logo">Auto<span>Elite</span></a>
+  <ul class="nav__links">
+    <li><a href="#catalogo">Catálogo</a></li>
+    <li><a href="#nosotros">Nosotros</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <div class="nav__actions" id="nav-actions">
+
+  <a href="login.html" class="btn btn--ghost">
+    Iniciar sesión
+  </a>
+
+  <a href="registro.html" class="btn btn--solid">
+    Registrarse
+  </a>
+
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero__bg"></div>
+  <div class="hero__content">
+    <p class="hero__eyebrow">Concesionario Premium · Bogotá</p>
+    <h1 class="hero__title">Conduce lo<br><em>extraordinario.</em></h1>
+    <p class="hero__sub">Vehículos seleccionados para quienes exigen más. Catálogo exclusivo, atención sin igual.</p>
+    <div class="hero__cta">
+      <a href="#catalogo" class="btn btn--solid btn--lg">Ver catálogo</a>
+      <a href="#contacto" class="btn btn--outline btn--lg">Hablar con un asesor</a>
+    </div>
+  </div>
+  <div class="hero__stat-strip">
+    <div class="stat"><span class="stat__n">300+</span><span class="stat__l">Clientes satisfechos</span></div>
+    <div class="stat__div"></div>
+    <div class="stat"><span class="stat__n" id="stat-inventory">—</span><span class="stat__l">Vehículos en inventario</span></div>
+    <div class="stat__div"></div>
+    <div class="stat"><span class="stat__n">24/7</span><span class="stat__l">Plataforma disponible</span></div>
+  </div>
+</section>
+
+<!-- CATEGORÍAS -->
+<section class="cats" id="catalogo">
+  <div class="wrapper">
+    <div class="section-head">
+      <p class="section-eyebrow">Explorar por tipo</p>
+      <h2 class="section-title">Nuestra colección</h2>
+    </div>
+    <div class="cats__grid">
+      <div class="cat-card cat-card--wide" data-category="Sedanes">
+        <div class="cat-card__img" style="background-image:url('https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&q=80')"></div>
+        <div class="cat-card__body"><h3>Sedanes</h3><p>Elegancia y confort para el día a día.</p><a href="#" class="cat-card__link">Ver modelos →</a></div>
+      </div>
+      <div class="cat-card" data-category="SUV">
+        <div class="cat-card__img" style="background-image:url('https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600&q=80')"></div>
+        <div class="cat-card__body"><h3>SUV</h3><p>Potencia y versatilidad.</p><a href="#" class="cat-card__link">Ver modelos →</a></div>
+      </div>
+      <div class="cat-card" data-category="Deportivos">
+        <div class="cat-card__img" style="background-image:url('https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=600&q=80')"></div>
+        <div class="cat-card__body"><h3>Deportivos</h3><p>Rendimiento sin compromisos.</p><a href="#" class="cat-card__link">Ver modelos →</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUSCADOR -->
+<section class="search-bar">
+  <div class="wrapper">
+    <p class="search-bar__label">Buscar vehículo</p>
+    <div class="search-bar__form">
+      <div class="field">
+        <label>Marca</label>
+        <select id="f-brand"><option value="">Todas las marcas</option></select>
+      </div>
+      <div class="field">
+        <label>Modelo</label>
+        <input type="text" id="f-model" placeholder="Ej. Serie 5">
+      </div>
+      <div class="field">
+        <label>Precio máx.</label>
+        <select id="f-price">
+          <option value="">Sin límite</option>
+          <option value="50000000">$50.000.000</option>
+          <option value="100000000">$100.000.000</option>
+          <option value="200000000">$200.000.000</option>
+          <option value="400000000">$400.000.000</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Año</label>
+        <select id="f-year">
+          <option value="">Cualquier año</option>
+          <option>2024</option><option>2023</option><option>2022</option>
+        </select>
+      </div>
+      <button class="btn btn--solid" id="btn-search">Buscar</button>
+      <button class="btn btn--ghost" id="btn-reset">Limpiar</button>
+    </div>
+  </div>
+</section>
+
+<!-- CATÁLOGO -->
+<section class="catalog">
+  <div class="wrapper">
+    <div class="section-head section-head--row">
+      <h2 class="section-title">Disponibles ahora</h2>
+      <a href="#" class="btn btn--ghost" id="btn-ver-todos">Ver todos</a>
+    </div>
+    <div class="catalog__grid" id="catalog-grid">
+      <p style="color:var(--muted)">Cargando catálogo…</p>
+    </div>
+  </div>
+</section>
+
+<!-- NOSOTROS -->
+<section class="about" id="nosotros">
+  <div class="wrapper about__inner">
+    <div class="about__text">
+      <p class="section-eyebrow">Quiénes somos</p>
+      <h2 class="section-title">Una experiencia de compra <em>diferente.</em></h2>
+      <p>En AutoElite cada vehículo está curado por expertos. No vendemos autos; facilitamos decisiones que duran años.</p>
+      <ul class="about__list">
+        <li><span>✓</span> Inventario actualizado en tiempo real</li>
+        <li><span>✓</span> Proceso 100% transparente</li>
+        <li><span>✓</span> Soporte antes y después de la compra</li>
+        <li><span>✓</span> Plataforma segura con HTTPS</li>
+      </ul>
+    </div>
+    <div class="about__visual">
+      <div class="about__img" style="background-image:url('https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&q=80')"></div>
+      <div class="about__badge"><strong>+5</strong><span>años de experiencia</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESO -->
+<section class="process">
+  <div class="wrapper">
+    <div class="section-head">
+      <p class="section-eyebrow">¿Cómo funciona?</p>
+      <h2 class="section-title">Tu compra en 4 pasos</h2>
+    </div>
+    <div class="process__steps">
+      <div class="step"><div class="step__num">01</div><h4>Regístrate</h4><p>Crea tu cuenta en segundos.</p></div>
+      <div class="step__line"></div>
+      <div class="step"><div class="step__num">02</div><h4>Explora</h4><p>Filtra por marca, modelo y precio.</p></div>
+      <div class="step__line"></div>
+      <div class="step"><div class="step__num">03</div><h4>Solicita</h4><p>Envía tu solicitud con un clic.</p></div>
+      <div class="step__line"></div>
+      <div class="step"><div class="step__num">04</div><h4>Confirma</h4><p>El inventario se actualiza automáticamente.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-banner">
+
+  <div class="wrapper" id="cta-banner-content">
+
+    <h2>
+      ¿Listo para encontrar tu próximo vehículo?
+    </h2>
+
+    <p>
+      Únete a nuestra plataforma y accede al catálogo completo.
+    </p>
+
+    <a
+      href="registro.html"
+      class="btn btn--solid btn--lg"
+    >
+      Crear cuenta gratis
+    </a>
+
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="contacto">
+  <div class="wrapper footer__inner">
+    <div class="footer__brand">
+      <a href="#" class="nav__logo">Auto<span>Elite</span></a>
+      <p>Concesionario digital de confianza.<br>Bogotá, Colombia · 2026</p>
+    </div>
+    <div class="footer__links"><h5>Plataforma</h5><ul><li><a href="#catalogo">Catálogo</a></li><li><a href="login.html">Iniciar sesión</a></li><li><a href="registro.html">Registrarse</a></li></ul></div>
+    <div class="footer__links"><h5>Legal</h5><ul><li><a href="#">Privacidad</a></li><li><a href="#">Términos</a></li></ul></div>
+    <div class="footer__links"><h5>Contacto</h5><ul><li><a href="mailto:autoelite@correo.com">autoelite@correo.com</a></li><li><a href="tel:+573100000000">+57 310 000 0000</a></li></ul></div>
+  </div>
+  <div class="footer__bottom">
+    <p>© 2026 AutoElite · Universidad Manuela Beltrán — Ingeniería Web</p>
+  </div>
+</footer>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Solicitar vehículo</h3>
+    <p id="modal-body">¿Confirmas tu solicitud de compra para este vehículo?</p>
+    <div class="modal__actions">
+      <button class="btn btn--ghost" id="modal-cancel">Cancelar</button>
+      <button class="btn btn--solid" id="modal-confirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Utilidades ───────────────────────────────────────
+  const $ = id => document.getElementById(id);
+  const fmt = n => '$' + n.toLocaleString('es-CO');
+  const toast = (msg, ms = 3000) => {
+    const el = $('toast');
+    el.textContent = msg; el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), ms);
+  };
+
+  // ── Catálogo: renderizar cards ───────────────────────
+  const badgeMap = { available: ['badge--available','Disponible'], sold: ['badge--sold','Vendido'], pending: ['badge--pending','En proceso'] };
+  const cardHTML = c => {
+    const [cls, label] = badgeMap[c.status] || badgeMap.sold;
+    const isAvail = c.status === 'available';
+    return `
+    <article class="v-card">
+      <div class="v-card__img" style="background-image:url('${c.img}')">
+        <span class="badge ${cls}">${label}</span>
+      </div>
+      <div class="v-card__body">
+        <p class="v-card__brand">${c.brand}</p>
+        <h3 class="v-card__model">${c.model} · ${c.year}</h3>
+        <ul class="v-card__specs"><li>${c.engine}</li><li>${c.trans}</li><li>${c.type}</li></ul>
+        <div class="v-card__footer">
+          <span class="v-card__price">${fmt(c.price)}</span>
+          ${isAvail
+            ? `<button class="btn btn--solid btn--sm" onclick="openModal(${c.id},'${c.brand} ${c.model}')">Solicitar</button>`
+            : `<button class="btn btn--ghost btn--sm" disabled>No disponible</button>`}
+        </div>
+      </div>
+    </article>`;
+  };
+
+  async function loadCars(params = {}) {
+    const qs = new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v)));
+    const cars = await fetch('/api/cars?' + qs).then(r => r.json());
+    const grid = $('catalog-grid');
+    grid.innerHTML = cars.length ? cars.map(cardHTML).join('') : '<p style="color:var(--muted)">No se encontraron vehículos.</p>';
+    const avail = cars.filter(c => c.status === 'available').length;
+    $('stat-inventory').textContent = avail;
+  }
+
+  // ── Filtros ──────────────────────────────────────────
+  async function loadBrands() {
+    const brands = await fetch('/api/brands').then(r => r.json());
+    const sel = $('f-brand');
+    brands.forEach(b => sel.insertAdjacentHTML('beforeend', `<option>${b}</option>`));
+  }
+
+  $('btn-search').onclick = () => loadCars({
+    brand: $('f-brand').value, model: $('f-model').value,
+    maxPrice: $('f-price').value, year: $('f-year').value
+  });
+
+  $('btn-reset').onclick = () => {
+    ['f-brand','f-price','f-year'].forEach(id => $(id).value = '');
+    $('f-model').value = '';
+    loadCars();
+  };
+
+  $('btn-ver-todos').onclick = e => { e.preventDefault(); $('btn-reset').click(); };
+
+  // ── Filtro por categoría (cards superiores) ──────────
+  document.querySelectorAll('.cat-card').forEach(card => {
+    card.addEventListener('click', e => {
+      e.preventDefault();
+      const cat = card.dataset.category;
+      document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      loadCars({ category: cat });
+      document.querySelector('#catalogo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => document.querySelector('.catalog').scrollIntoView({ behavior: 'smooth' }), 300);
+    });
+  });
+
+  // ── Modal solicitud ──────────────────────────────────
+  let pendingId = null;
+  async function openModal(id, name) {
+    const { user } = await fetch('/api/auth/me').then(r => r.json());
+    if (!user) { toast('⚠ Inicia sesión para solicitar un vehículo'); setTimeout(() => location.href = 'login.html', 1500); return; }
+    pendingId = id;
+    $('modal-title').textContent = 'Solicitar vehículo';
+    $('modal-body').textContent = `¿Confirmas tu solicitud para el ${name}? Un asesor se pondrá en contacto contigo.`;
+    $('modal').classList.add('open');
+  }
+
+  $('modal-cancel').onclick = () => $('modal').classList.remove('open');
+  $('modal').onclick = e => { if (e.target === $('modal')) $('modal').classList.remove('open'); };
+
+  $('modal-confirm').onclick = async () => {
+    $('modal').classList.remove('open');
+    const res = await fetch(`/api/cars/${pendingId}/request`, { method: 'POST' });
+    const data = await res.json();
+    toast(data.ok ? '✓ ' + data.message : '✗ ' + data.error);
+    if (data.ok) loadCars();
+  };
+
+  // ── Smooth scroll nav links ──────────────────────────
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+
+  // ── Init ─────────────────────────────────────────────
+  loadBrands();
+  loadCars();
+  // ======================================
+// VERIFICAR SESIÓN
+// ======================================
+
+async function checkSession(){
+
+  try{
+
+    const res = await fetch('/api/auth/me');
+
+    const data = await res.json();
+
+    if(data.user){
+
+      document.getElementById('nav-actions').innerHTML = `
+
+        <div style="
+          display:flex;
+          align-items:center;
+          gap:1rem;
+        ">
+
+          <div style="
+            color:white;
+            font-weight:500;
+            padding:.8rem 1rem;
+            border-radius:999px;
+            border:1px solid var(--border);
+            background:rgba(255,255,255,.03);
+            backdrop-filter:blur(10px);
+          ">
+            👋 ${data.user.name}
+          </div>
+
+          <button
+            class="btn btn--ghost"
+            onclick="logout()"
+          >
+            Cerrar sesión
+          </button>
+
+        </div>
+
+      `;
+// CAMBIAR CTA INFERIOR
+document.getElementById('cta-banner-content').innerHTML = `
+
+  <h2>
+    Bienvenido nuevamente, ${data.user.name}
+  </h2>
+
+  <p>
+    Ya tienes acceso completo al catálogo premium de AutoElite.
+  </p>
+
+  <button
+    class="btn btn--solid btn--lg"
+    onclick="document.querySelector('.catalog').scrollIntoView({
+      behavior:'smooth'
+    })"
+  >
+    Ver vehículos disponibles
+  </button>
+
+`;
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+}
+
+// ======================================
+// CERRAR SESIÓN
+// ======================================
+
+async function logout(){
+
+  await fetch('/api/auth/logout', {
+
+    method:'POST'
+
+  });
+
+  window.location.reload();
+
+}
+
+// INICIAR
+checkSession();
+</script>
+</body>
+</html>

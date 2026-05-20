@@ -23,16 +23,16 @@ AutoElite es una aplicación web full stack que permite a los usuarios explorar 
 ---
 
 ## Estructura del proyecto
-autoelite/
-├── server.js ← Servidor principal y rutas API
-├── db.js ← Conexión a MySQL
-├── package.json
-├── autoelite.sql ← Script de base de datos
-└── public/
-├── index.html     ← Página principal y catálogo
-├── login.html     ← Inicio de sesión
-├── registro.html  ← Registro de usuario
-└── style.css      ← Estilos globales
+| Archivo / Carpeta | Descripción |
+|-------------------|-------------|
+| `server.js` | Servidor principal, rutas API y middlewares |
+| `db.js` | Conexión y pool de MySQL |
+| `package.json` | Dependencias del proyecto |
+| `autoelite.sql` | Script de creación de base de datos |
+| `public/index.html` | Página principal con catálogo y filtros |
+| `public/login.html` | Formulario de inicio de sesión |
+| `public/registro.html` | Formulario de registro de usuario |
+| `public/style.css` | Estilos globales de la aplicación |
 
 ---
 
